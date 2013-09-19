@@ -15,7 +15,7 @@ use NiftyGrid,
 	NiftyGrid\FilterCondition;
 
 
-class Column extends \Nette\Application\UI\PresenterComponent
+class Column extends \Nette\Application\UI\Control
 {
 	/** @var string */
 	public $name;
@@ -33,7 +33,16 @@ class Column extends \Nette\Application\UI\PresenterComponent
 	public $truncate;
 
 	/** @var callback */
-	public $renderCallback;
+	public $renderer;
+
+	/** @var callback */
+	private $templateRenderer;
+
+	/** @var string */
+	private $templateFileName;
+
+	/** @var string */
+	private $templateBasePath;
 
 	/** @var callback */
 	public $formRenderer;
@@ -128,15 +137,20 @@ class Column extends \Nette\Application\UI\PresenterComponent
 	 */
 	public function prepareValue($row)
 	{
-		if(!empty($this->renderer))
+		if(!empty($this->renderer)) {
 			$value = call_user_func($this->renderer, (object)$row);
-		else
-			$value = $row[$this->name];
+		} else {
+			if (!empty($this->templateRenderer)) {
+				$value = $this->renderTemplate((object) $row);
+			} else {
+				$value = $row[$this->name];
+			}
+		}
 
 		if(!empty($this->truncate))
-			return \Nette\Utils\Strings::truncate($value, $this->truncate);
+			return htmlSpecialChars(\Nette\Utils\Strings::truncate($value, $this->truncate));
 		else
-			return $value;
+			return htmlSpecialChars($value);
 	}
 
 	/**
@@ -146,6 +160,44 @@ class Column extends \Nette\Application\UI\PresenterComponent
 	public function setRenderer($renderer)
 	{
 		$this->renderer = $renderer;
+
+		return $this;
+	}
+
+	/**
+	 * @param callback $renderer
+	 * @return Column
+	 */
+	public function setTemplateRenderer($templateRenderer)
+	{
+		$this->templateRenderer = $templateRenderer;
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string $templateBasePath
+	 * @return Column
+	 */
+	public function setTemplateBasePath($templateBasePath)
+	{
+		if (substr($templateBasePath, -1) != '/') {
+			$templateBasePath .= '/';
+		}
+		$this->templateBasePath = $templateBasePath;
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string $templateFileName
+	 * @return Column
+	 */
+	public function setTemplateFileName($templateFileName)
+	{
+		$this->templateFileName = $templateFileName;
 
 		return $this;
 	}
@@ -400,5 +452,37 @@ class Column extends \Nette\Application\UI\PresenterComponent
 		$this->filterType = FilterCondition::BOOLEAN;
 
 		return $this;
+	}
+
+
+	private function renderTemplate($row)
+	{
+		if (!is_callable($this->templateRenderer)) {
+			throw new \Nette\InvalidStateException('Template renderer must be function');
+		}
+
+		if (empty($this->templateBasePath)) {
+			throw new \Nette\InvalidStateException('Template base path is not set. Set by $column->setTemplateBasePath');
+		}
+
+		if ($this->templateFileName) {
+			$this->template->setFile($this->templateBasePath . $this->templateFileName);
+		} else {
+			$templateFileName = '';
+			$nameParts = explode('_', strtolower($this->getName()));
+			foreach ($nameParts as $namePart) {
+				$templateFileName .= ucwords($namePart);
+			}
+			$templateFileName .= '.latte';
+
+			$this->template->setFile($this->templateBasePath . lcfirst($templateFileName));
+		}
+
+		$template = $this->getTemplate();
+
+		$template->row = $row;
+		$template = call_user_func($this->templateRenderer, $row, $template);
+
+		return (string) $template;
 	}
 }

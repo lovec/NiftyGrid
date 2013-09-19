@@ -96,7 +96,7 @@
 					{if $control->isEditable() && $column->editable && $control->activeRowForm == $row[$primaryKey]}
 					{$control['gridForm'][$control->name]['rowForm'][$column->name]->getControl()}
 				{else}
-					{$column->prepareValue($row)}
+					{!$column->prepareValue($row)}
 				{/if}
 				</td>
 				<td n:if="$control->hasButtons() || $control->hasFilterForm()" n:attr="class => array(grid-row-cell, grid-buttons, $control->isEditable() && $control->activeRowForm == $row[$primaryKey] ? 'grid-edited-cell')">
