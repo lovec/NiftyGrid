@@ -68,6 +68,9 @@ class Column extends \Nette\Application\UI\Control
 	/** @var Grid */
 	public $parent;
 
+	/** @string */
+	private $escapingDisabled = false;
+
 	/**
 	 * @param Grid $parent
 	 */
@@ -147,10 +150,11 @@ class Column extends \Nette\Application\UI\Control
 			}
 		}
 
-		if(!empty($this->truncate))
-			return htmlSpecialChars(\Nette\Utils\Strings::truncate($value, $this->truncate));
-		else
-			return htmlSpecialChars($value);
+		if(!empty($this->truncate)) {
+			$value = \Nette\Utils\Strings::truncate($value, $this->truncate);
+		}
+
+		return $this->escapingDisabled ? $value : htmlSpecialChars($value);
 	}
 
 	/**
@@ -455,6 +459,16 @@ class Column extends \Nette\Application\UI\Control
 	}
 
 
+	/**
+	 * @return Column
+	 */
+	public function disableEscaping()
+	{
+		$this->escapingDisabled = true;
+
+		return $this;
+	}
+
 	private function renderTemplate($row)
 	{
 		if (!is_callable($this->templateRenderer)) {
@@ -465,6 +479,7 @@ class Column extends \Nette\Application\UI\Control
 			throw new \Nette\InvalidStateException('Template base path is not set. Set by $column->setTemplateBasePath');
 		}
 
+		$this->disableEscaping();
 		if ($this->templateFileName) {
 			$this->template->setFile($this->templateBasePath . $this->templateFileName);
 		} else {
