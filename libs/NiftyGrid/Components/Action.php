@@ -110,7 +110,7 @@ class Action extends \Nette\Application\UI\PresenterComponent
 		}
 
 		if(!empty($this->dialog)){
-			$option->addData("grid-confirm", $this->dialog);
+			$option->setAttribute("data-grid-confirm", $this->dialog);
 		}
 
 		return $option;

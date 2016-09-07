@@ -262,11 +262,11 @@ class Button extends \Nette\Application\UI\PresenterComponent
 
 		if(!empty($this->icon)){
 			$icon = Html::el('i')->setClass($this->getIcon($row));
-			$el->add($icon);
+			$el->addHtml($icon);
 		}
 
 		if(!empty($this->text)){
-			$el->add(' '.$this->getText($row));
+			$el->addHtml(' '.$this->getText($row));
 		}
 
 		if($this->getName() == Grid::ROW_FORM) {
@@ -275,7 +275,7 @@ class Button extends \Nette\Application\UI\PresenterComponent
 
 		if($this->hasConfirmationDialog()){
 			$el->addClass("grid-confirm")
-				->addData("grid-confirm", $this->getConfirmationDialog($row));
+				->setAttribute("data-grid-confirm", $this->getConfirmationDialog($row));
 		}
 
 		if($this->ajax){

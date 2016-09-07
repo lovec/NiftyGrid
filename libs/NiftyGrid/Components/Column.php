@@ -263,9 +263,9 @@ class Column extends \Nette\Application\UI\Control
 		}
 		$this->parent['gridForm'][$this->parent->name]['filter'][$this->name]->getControlPrototype()
 			->addClass("grid-autocomplete")
-			->addData("column", $this->name)
-			->addData("gridName", $this->parent->getGridPath())
-			->addData("link",$this->parent->link("autocomplete!"));
+			->setAttribute("data-column", $this->name)
+			->setAttribute("data-gridName", $this->parent->getGridPath())
+			->setAttribute("data-link",$this->parent->link("autocomplete!"));
 
 		$this->autocomplete = TRUE;
 
