@@ -266,7 +266,7 @@ class Button extends \Nette\Application\UI\PresenterComponent
 		}
 
 		if(!empty($this->text)){
-			$el->addHtml(' '.$this->getText($row));
+			$el->addText(' '.$this->getText($row));
 		}
 
 		if($this->getName() == Grid::ROW_FORM) {
