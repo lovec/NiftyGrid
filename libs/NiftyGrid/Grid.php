@@ -99,7 +99,7 @@ abstract class Grid extends \Nette\Application\UI\Control
 		$this->addComponent(New \Nette\ComponentModel\Container(), "subGrids");
 
 		if($presenter->isAjax()){
-			$this->invalidateControl();
+			$this->redrawControl();
 		}
 
 		$this->configure($presenter);
@@ -753,14 +753,14 @@ abstract class Grid extends \Nette\Application\UI\Control
 		$form[$this->name]['action']->addSubmit("send","Potvrdit")
 			->setValidationScope(FALSE)
 			->getControlPrototype()
-			->addData("select", $form[$this->name]["action"]["action_name"]->getControl()->name);
+			->setAttribute("data-select", $form[$this->name]["action"]["action_name"]->getControl()->name);
 
 		$form[$this->name]->addContainer('perPage');
 		$form[$this->name]['perPage']->addSelect("perPage","Záznamů na stranu:", $this->perPageValues)
 			->getControlPrototype()
 			->addClass("grid-changeperpage")
-			->addData("gridname", $this->getGridPath())
-			->addData("link", $this->link("changePerPage!"));
+			->setAttribute("data-gridname", $this->getGridPath())
+			->setAttribute("data-link", $this->link("changePerPage!"));
 		$form[$this->name]['perPage']->addSubmit("send","Ok")
 			->setValidationScope(FALSE)
 			->getControlPrototype()
@@ -768,7 +768,7 @@ abstract class Grid extends \Nette\Application\UI\Control
 
 		$form->setTranslator($this->getTranslator());
 
-		$form->onSuccess[] = callback($this, "processGridForm");
+		$form->onSuccess[] = [$this, "processGridForm"];
 
 		return $form;
 	}
@@ -883,7 +883,7 @@ abstract class Grid extends \Nette\Application\UI\Control
 			$isSubGrid = ($gridName == $this->name) ? FALSE : TRUE;
 			if (!is_array($grid)) {
 				continue;
-			}			
+			}
 			foreach($grid['filter'] as $name => $value){
 				if($value != ''){
 					if($name == "send"){

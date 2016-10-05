@@ -250,7 +250,7 @@ class SubGrid extends \Nette\Application\UI\PresenterComponent
 			->setTitle($this->getLabel($row));
 
 		$icon = \Nette\Utils\Html::el('i')->setClass($this->getIcon($row));
-		$el->add($icon);
+		$el->addHtml($icon);
 
 		if($this->ajax){
 			$el->addClass("grid-ajax");
