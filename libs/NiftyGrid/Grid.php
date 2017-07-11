@@ -34,7 +34,7 @@ abstract class Grid extends \Nette\Application\UI\Control
 	public $activeSubGridName;
 
 	/** @var array */
-	protected $perPageValues = array(20 => 20, 50 => 50, 100 => 100);
+	protected $perPageValues = array('20' => '20', '50' => '50', '100' => '100');
 
 	/** @var bool */
 	public $paginate = TRUE;
@@ -412,7 +412,7 @@ abstract class Grid extends \Nette\Application\UI\Control
 	{
 		$perPageValues = array();
 		foreach($values as $value){
-			$perPageValues[$value] = $value;
+			$perPageValues[strval($value)] = strval($value);
 		}
 		$this->perPageValues = $perPageValues;
 	}
